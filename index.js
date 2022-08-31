@@ -3,6 +3,7 @@ const fs = require("fs/promises");
 const chalk = require("chalk");
 const { readFile, writeFile } = require("fs");
 const QUOTE_FILE = "quotes.txt";
+const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
 
 program
   .name("quotes")
@@ -24,8 +25,9 @@ program
       const quote = JSON.stringify(quoteAndAuthor[0])
       const author = JSON.stringify(quoteAndAuthor[1])
       // You may style the text with chalk as you wish
-      console.log(chalk.bgCyan(quote))
-      console.log(chalk.cyan(author))
+      const colorQuote = chalk.bgCyan(quote)
+      const colorAuthor = chalk.cyan(author)
+      pipe(colorQuote, colorAuthor, console.log)
   });
 
 program
@@ -50,8 +52,7 @@ program
     console.log(chalk.yellow("Your quote is saved!"))
     // HINT: You can store both author and quote on the same line using
     // a separator like pipe | and then using .split() when retrieving
-    const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
-    pipe(addQuote, addAuthor)
+    await pipe(addQuote, addAuthor)
   });
 
 program.parse();
